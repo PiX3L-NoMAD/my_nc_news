@@ -1,7 +1,15 @@
 # Northcoders News API
+In order to access the databases, create the files:
 
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
+* #### .env.test
 
+* #### .env.development
+
+#### Inside .env.test add the line:
+    PGDATABASE=nc_news_test
+
+#### Inside .env.development add the line:
+    PGDATABASE=nc_news
 
 
 --- 
