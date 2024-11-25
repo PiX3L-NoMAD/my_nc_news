@@ -1,7 +1,13 @@
+const request = require("supertest");
 const endpointsJson = require("../endpoints.json");
-/* Set up your test imports here */
+const app = require("../app");
+const db = require("../db/connection");
+const data = require("../db/data/test-data/index");
+const seed = require("../db/seeds/seed");
 
-/* Set up your beforeEach & afterAll functions here */
+beforeEach(() => seed(data));
+
+afterAll(() => db.end());
 
 describe("GET /api", () => {
   test("200: Responds with an object detailing the documentation for each endpoint", () => {
