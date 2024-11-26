@@ -4,6 +4,7 @@ const app = require("../app");
 const db = require("../db/connection");
 const data = require("../db/data/test-data/index");
 const seed = require("../db/seeds/seed");
+const jestSorted = require('jest-sorted');
 
 beforeEach(() => seed(data));
 
@@ -37,24 +38,37 @@ describe("GET /api/topics", () => {
 });
 
 describe("GET /api/articles", () => {
-  test("200: Responds with an array of all article objects", () => {
+  test("200: Responds with an array of all article objects, incl comments_count, sorted by date", () => {
     return request(app)
     .get("/api/articles")
     .expect(200)
-    .then(({ body: { articles } }) => {
+    .then(({ body: {articles} }) => {
+
         expect(articles.length).toBeGreaterThan(0);
 
+        expect(articles).toBeSortedBy('created_at', {
+          descending: true,
+          coerce: true,
+        });
+
         articles.forEach((article) => {
-          expect(article).toHaveProperty("title");
-          expect(article).toHaveProperty("topic");
-          expect(article).toHaveProperty("author");
-          expect(article).toHaveProperty("body");
-          expect(article).toHaveProperty("created_at");
-          expect(article).toHaveProperty("votes");
-          expect(article).toHaveProperty("article_img_url");
+          expect(article).toEqual(
+            expect.objectContaining({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          })
+        )
+
+        expect(article).not.toHaveProperty("body");
         })
       });
-  });
+    });
 });
 
 describe("GET /api/articles/:article_id", () => {

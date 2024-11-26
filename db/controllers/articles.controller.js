@@ -2,13 +2,15 @@ const endpoints = require("../../endpoints.json");
 const { selectAllArticles, selectArticleById } = require("../models/articles.model");
 
 exports.getArticles = (req, res, next) => {
-    selectAllArticles()
-      .then((articles) => {
-        res.status(200).send({ articles: articles });
-      })
-      .catch((err) => {
-        next(err);
-      });
+  const { sort_by, order } = req.query;
+
+  selectAllArticles(sort_by, order)
+    .then((articles) => {
+      res.status(200).send({ articles });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
   
 exports.getArticleById = (req, res, next) => {
