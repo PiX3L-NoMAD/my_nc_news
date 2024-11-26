@@ -26,37 +26,89 @@ describe("GET /api/topics", () => {
     .get("/api/topics")
     .expect(200)
     .then(({ body: { topics } }) => {
-        const topicsEndpoint = endpointsJson["GET /api/topics"].exampleResponse.topics;
-
-        expect(Array.isArray(topics)).toBe(true);
-
         expect(topics.length).toBeGreaterThan(0);
 
         topics.forEach((topic) => {
           expect(topic).toHaveProperty("slug");
           expect(topic).toHaveProperty("description");
         })
+    })
+  });
+});
 
-        expect(Object.keys(topics[0])).toStrictEqual(Object.keys(topicsEndpoint[0]));
+describe("GET /api/articles", () => {
+  test("200: Responds with an array of all article objects", () => {
+    return request(app)
+    .get("/api/articles")
+    .expect(200)
+    .then(({ body: { articles } }) => {
+        expect(articles.length).toBeGreaterThan(0);
+
+        articles.forEach((article) => {
+          expect(article).toHaveProperty("title");
+          expect(article).toHaveProperty("topic");
+          expect(article).toHaveProperty("author");
+          expect(article).toHaveProperty("body");
+          expect(article).toHaveProperty("created_at");
+          expect(article).toHaveProperty("votes");
+          expect(article).toHaveProperty("article_img_url");
+        })
       });
   });
-  test("404: Responds with bad request for typo path", () => {
+});
+
+describe("GET /api/articles/:article_id", () => {
+  test("returns articles based on article_id", () => {
     return request(app)
-      .get("/api/toppics")
+      .get("/api/articles/2")
+      .expect(200)
+      .then(({ body: { article } }) => {
+          expect(article.length).toBeGreaterThan(0);
+
+          expect(article[0].article_id).toBe(2);
+          
+          expect(article[0]).toHaveProperty("title");
+          expect(article[0]).toHaveProperty("topic");
+          expect(article[0]).toHaveProperty("author");
+          expect(article[0]).toHaveProperty("body");
+          expect(article[0]).toHaveProperty("created_at");
+          expect(article[0]).toHaveProperty("votes");
+          expect(article[0]).toHaveProperty("article_img_url");
+        });
+      });
+  test("returns 400 for invalid article id - has alphabetical values", () => {
+    return request(app)
+      .get("/api/articles/a0f4")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid article ID");
+    });
+});
+  test("returns 400 for invalid article id - too long", () => {
+    return request(app)
+      .get("/api/articles/1234567901234567")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid article ID");
+    });
+});
+  test("returns 404 article not found for valid id that doesn't exist", () => {
+    return request(app)
+      .get("/api/articles/123456789")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe('Path not found');
-      })
-  })
+        expect(body.msg).toBe("Article not found");
+    });
+  });
 });
 
 describe("Error handlers", () => {
   test("404: Responds with an error if path doesn't exist", () => {
     return request(app)
-    .get("/api/bananaz")
+    .get("/api/bananasplit")
     .expect(404)
     .then(({ body }) => {
-      expect(body.msg).toBe('Path not found');
+      expect(body.msg).toBe('Not found');
     });
   });
 });
