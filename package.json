@@ -22,13 +22,14 @@
   "homepage": "https://github.com/northcoders/be-nc-news#readme",
   "dependencies": {
     "dotenv": "^16.0.0",
-    "pg": "^8.13.1",
-    "express": "^4.21.1"
+    "express": "^4.21.1",
+    "pg": "^8.13.1"
   },
   "devDependencies": {
     "husky": "^8.0.2",
     "jest": "^27.5.1",
     "jest-extended": "^2.0.0",
+    "jest-sorted": "^1.0.15",
     "pg-format": "^1.0.4",
     "supertest": "^7.0.0"
   },
