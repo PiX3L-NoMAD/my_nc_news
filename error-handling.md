@@ -56,7 +56,9 @@ The following is _not_ a comprehensive list! Its purpose is just to get the ball
 
 ### GET `/api/articles/:article_id/comments`
 
-- ???
+- 204: No content (e.g. `comments` available for existing `article_id`)
+- 400: Invalid path (e.g. `/articles/3/4`)
+- 404: Typo in the path (e.g. `/articles/3/coments`)
 
 ### GET `/api/articles`
 

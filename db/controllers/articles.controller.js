@@ -1,5 +1,5 @@
-const endpoints = require("../../endpoints.json");
-const { selectAllArticles, selectArticleById } = require("../models/articles.model");
+const endpoints = require('../../endpoints.json');
+const { selectAllArticles, selectArticleById } = require('../models/articles.model');
 
 exports.getArticles = (req, res, next) => {
   const { sort_by, order } = req.query;
@@ -24,4 +24,3 @@ exports.getArticleById = (req, res, next) => {
       next(err);
     });
 };
-  
