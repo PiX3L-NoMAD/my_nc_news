@@ -68,7 +68,23 @@ describe("GET /api/articles", () => {
         expect(article).not.toHaveProperty("body");
         })
       });
-    });
+  });
+  test("404: For sort_by, column that doesn't exist", () => {
+      return request(app)
+        .get("/api/articles?sort_by=bananas")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid query");
+      });
+  });
+  test("404: For order, value that's not allowed'", () => {
+    return request(app)
+      .get("/api/articles?sort_by=created_at&order=dasc")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid query");
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id", () => {
@@ -90,7 +106,7 @@ describe("GET /api/articles/:article_id", () => {
           expect(article[0]).toHaveProperty("article_img_url");
         });
       });
-  test("returns 400 for invalid article id - has alphabetical values", () => {
+  test("returns 400 for invalid article id - NaN", () => {
     return request(app)
       .get("/api/articles/a0f4")
       .expect(400)
@@ -112,6 +128,41 @@ describe("GET /api/articles/:article_id", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Article not found");
+    });
+  });
+});
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: Returns all comments based on article_id, descending order", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+          expect(comments.length).toBeGreaterThan(0);
+
+          expect(comments[0].article_id).toBe(1);
+
+          expect(comments).toBeSorted({ descending: true });
+
+          comments.forEach((comment) => {
+            expect(comment).toEqual(
+              expect.objectContaining({
+                comment_id: expect.any(Number),
+                votes: expect.any(Number),
+                created_at: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                article_id: expect.any(Number),
+            }))
+          })
+        })
+      });
+  test("204: returns no comments found when using a valid article_id that has no comments", () => {
+    return request(app)
+      .get("/api/articles/23425/comments")
+      .expect(204)
+      .then(({ body }) => {
+        expect(body).toEqual({});
     });
   });
 });

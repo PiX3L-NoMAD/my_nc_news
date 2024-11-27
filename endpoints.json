@@ -53,5 +53,29 @@
         }
       ]
     }
+  },
+  "GET /api/articles/:article_id/comments": {
+  "description": "Serves an array of comments for the given article_id, sorted by most recent comment first",
+  "queries": [],
+  "exampleResponse": {
+    "comments": [
+      {
+        "comment_id": 14,
+        "votes": 10,
+        "created_at": "2021-06-12T12:34:56.789Z",
+        "author": "user123",
+        "body": "This article is amazing!",
+        "article_id": 1
+      },
+      {
+        "comment_id": 15,
+        "votes": 5,
+        "created_at": "2021-06-11T11:22:33.456Z",
+        "author": "anotherUser321",
+        "body": "Interesting perspective.",
+        "article_id": 1
+        }
+      ]
+    }
   }
 }
