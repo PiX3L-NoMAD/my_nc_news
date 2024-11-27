@@ -1,12 +1,7 @@
 const db = require("../connection");
-const { isValidId } = require('../../utils');
 
 exports.selectCommentsByArticleId = (article_id) => {
-    
-    if (!isValidId(article_id)) {
-      return Promise.reject({ status: 400, msg: "Invalid article ID" })
-    }
-    
+
     const sqlQuery = `
     SELECT 
         comments.comment_id,
@@ -24,4 +19,17 @@ exports.selectCommentsByArticleId = (article_id) => {
       .then(({ rows }) => {
         return rows;
       })
-  }
+}
+
+exports.addComment = (article_id, username, body) => {
+
+    const sqlQuery = `
+        INSERT INTO comments 
+        (article_id, author, body)
+        VALUES ($1, $2, $3)
+        RETURNING *;`;
+
+    return db.query(sqlQuery, [article_id, username, body]).then(({ rows }) => {
+        return rows;
+    })
+}

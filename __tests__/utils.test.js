@@ -3,7 +3,6 @@ const {
   createRef,
   formatComments,
 } = require('../db/seeds/utils');
-const { isValidId } = require('../utils');
 
 describe('convertTimestampToDate', () => {
   test('returns a new object', () => {
@@ -103,15 +102,3 @@ describe('formatComments', () => {
     expect(formattedComments[0].created_at).toEqual(new Date(timestamp));
   });
 });
-
-describe('isValidId', () => {
-  test('returns true when given a valid id - a number and no longer than 15 digits', () => {
-    expect(isValidId("45")).toBe(true);
-  })
-  test('expect false when given an invalid id - NaN', () => {
-    expect(isValidId("tw3lve")).toBe(false);
-  })
-  test('expect false when given an invalid id - more than 15 digits', () => {
-    expect(isValidId("1234567890123456789")).toBe(false);
-  })
-})

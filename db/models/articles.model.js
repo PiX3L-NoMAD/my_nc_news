@@ -1,5 +1,4 @@
 const db = require("../connection");
-const { isValidId } = require('../../utils');
 
 exports.selectAllArticles = (sort_by = "created_at", order = "desc") => {
   const validSortBy = "created_at";
@@ -32,14 +31,11 @@ exports.selectAllArticles = (sort_by = "created_at", order = "desc") => {
 
 exports.selectArticleById = (article_id) => {
 
-  if (!isValidId(article_id)) {
-    return Promise.reject({ status: 400, msg: "Invalid article ID" })
-  }
-
   const sqlQuery = `SELECT * FROM articles WHERE article_id = $1;`;
 
   return db
-    .query(sqlQuery, [article_id]).then(({ rows }) => {
+    .query(sqlQuery, [article_id])
+    .then(({ rows }) => {
       if (rows.length === 0) {
         return Promise.reject({ status: 404, msg: "Article not found"})
       }
