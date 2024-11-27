@@ -1,7 +1,7 @@
 const endpointsJson = require('./endpoints.json');
 const { getApi } = require('./db/controllers/app.controller');
 const { getArticles, getArticleById } = require('./db/controllers/articles.controller');
-const { getCommentsByArticleId } = require('./db/controllers/comments.controller');
+const { getCommentsByArticleId, postCommentByArticleId } = require('./db/controllers/comments.controller');
 const { getTopics }= require('./db/controllers/topics.controller');
 const { badPathErrorHandler, postgresErrorHandler, customErrorHandler, serverErrorHandler } = require('./errors/errors');
 
@@ -19,6 +19,8 @@ app.get('/api/articles', getArticles);
 app.get('/api/articles/:article_id', getArticleById);
 
 app.get('/api/articles/:article_id/comments', getCommentsByArticleId);
+
+app.post('/api/articles/:article_id/comments', postCommentByArticleId);
 
 app.all('*', badPathErrorHandler);
 

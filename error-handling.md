@@ -41,8 +41,8 @@ The following is _not_ a comprehensive list! Its purpose is just to get the ball
 
 ### GET `/api/articles/:article_id`
 
-- Bad `article_id` (e.g. `/dog`)
-- Well formed `article_id` that doesn't exist in the database (e.g. `/999999`)
+- Status 400: Bad `article_id` (e.g. `/dog`), should be an integer number
+- Status 404: Well formed `article_id` that doesn't exist in the database (e.g. `/999999`)
 
 ### PATCH `/api/articles/:article_id`
 
@@ -52,19 +52,21 @@ The following is _not_ a comprehensive list! Its purpose is just to get the ball
 
 ### POST `/api/articles/:article_id/comments`
 
-- ???
+- 201: Successfully created a new comment with `article_id`, `username` and `body` being all valid (e.g. `/articles/1/comments` with a request body of `{ username: 'user123', body: 'Here's my comment.' }`)
+- 400: Bad request for `username` or `body` in the input body, both must be present and valid.
+- 400: Bad request for invalid `article_id` (e.g. `/articles/a1/comments`), must be an integer
 
 ### GET `/api/articles/:article_id/comments`
 
-- 204: No content (e.g. `comments` available for existing `article_id`)
+- 204: No content (e.g. no `comments` available for an existing `article_id`)
 - 400: Invalid path (e.g. `/articles/3/4`)
 - 404: Typo in the path (e.g. `/articles/3/coments`)
 
 ### GET `/api/articles`
 
 - Bad queries:
-  - `sort_by` a column that doesn't exist
-  - `order` !== "asc" / "desc"
+  - 400: `sort_by` a column that doesn't exist
+  - 400: `order` !== "asc" / "desc"
   - `topic` that is not in the database
   - `topic` that exists but does not have any articles associated with it
 

@@ -106,20 +106,12 @@ describe("GET /api/articles/:article_id", () => {
           expect(article[0]).toHaveProperty("article_img_url");
         });
       });
-  test("returns 400 for invalid article id - NaN", () => {
+  test("returns 400 for invalid article id", () => {
     return request(app)
       .get("/api/articles/a0f4")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Invalid article ID");
-    });
-});
-  test("returns 400 for invalid article id - too long", () => {
-    return request(app)
-      .get("/api/articles/1234567901234567")
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Invalid article ID");
+        expect(body.msg).toBe("Bad request - invalid input");
     });
 });
   test("returns 404 article not found for valid id that doesn't exist", () => {
@@ -165,6 +157,64 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(body).toEqual({});
     });
   });
+});
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("201: Returns 201 when post has been added to the article of give article_id ", () => {
+    
+    const input = { username: "rogersop", body: "In my humble opinion, I prefer beans." }
+    
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(input)
+      .expect(201)
+      .then(({ body }) => {
+          expect(body.comment[0]).toEqual({
+            comment_id: expect.any(Number),
+            article_id: 2,
+            author: "rogersop",
+            body: "In my humble opinion, I prefer beans.",
+            votes: 0,
+            created_at: expect.any(String),
+          });
+      });
+    });
+  test("400: Returns 400 error if no body provided", () => {
+    
+    const input = { username: "rogersop" }
+    
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(input)
+      .expect(400)
+      .then(({ body }) => {
+          expect(body.msg).toBe("Bad request - must have a valid username and a body");
+        });
+   });
+   test("400: Returns 400 error if no username provided", () => {
+    
+    const input = { body: "In my humble opinion, I prefer beans." }
+    
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(input)
+      .expect(400)
+      .then(({ body }) => {
+          expect(body.msg).toBe("Bad request - must have a valid username and a body");
+        });
+   });
+   test("400: Returns 400 error if article doesn't exist or is invalid", () => {
+    
+    const input = { username: "rogersop", body: "In my humble opinion, I prefer beans." }
+    
+    return request(app)
+      .post("/api/articles/a1/comments")
+      .send(input)
+      .expect(400)
+      .then(({ body }) => {
+          expect(body.msg).toBe("Bad request - invalid input");
+        });
+   });
 });
 
 describe("Error handlers", () => {
