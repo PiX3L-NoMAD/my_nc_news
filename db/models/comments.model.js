@@ -14,7 +14,6 @@ exports.selectCommentsByArticleId = async (article_id) => {
         comments.body, 
         comments.article_id  
     FROM comments
-    LEFT JOIN articles ON comments.article_id = articles.article_id
     WHERE comments.article_id = $1
     ORDER BY comments.created_at DESC;`;
   
@@ -33,7 +32,7 @@ exports.addComment = async (article_id, username, body) => {
         RETURNING *;`;
 
     return db.query(sqlQuery, [article_id, username, body]).then(({ rows }) => {
-        return rows;
+        return rows[0];
     })
 }
 

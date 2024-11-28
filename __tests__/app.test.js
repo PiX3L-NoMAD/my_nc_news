@@ -152,13 +152,13 @@ describe("GET /api/articles/:article_id", () => {
 
   describe("404: Not found error", () => {
 
-    test("Article not found for valid id that doesn't exist", () => {
+    test("resource not found for valid id that doesn't exist", () => {
       return request(app)
         .get("/api/articles/123456789")
         .expect(404)
         .then(({ body }) => {
 
-          expect(body.msg).toBe("Article not found");
+          expect(body.msg).toBe("Resource not found");
 
         });
     });
@@ -167,8 +167,7 @@ describe("GET /api/articles/:article_id", () => {
 
 describe("GET /api/articles/:article_id/comments", () => {
 
-  describe("200: Success responses", () => {
-    
+  describe("200: Success responses", () => { 
     test("returns all comments based on article_id, latest comment first (descending order)", () => {
       return request(app)
         .get("/api/articles/1/comments")
@@ -177,11 +176,8 @@ describe("GET /api/articles/:article_id/comments", () => {
 
           expect(comments.length).toBeGreaterThan(0);
 
-          expect(comments[0].article_id).toBe(1);
-
-          expect(comments).toBeSorted({ descending: true });
-
           comments.forEach((comment) => {
+            expect(comment.article_id).toBe(1);
             expect(comment).toEqual(
               expect.objectContaining({
                 comment_id: expect.any(Number),
@@ -191,85 +187,102 @@ describe("GET /api/articles/:article_id/comments", () => {
                 body: expect.any(String),
                 article_id: expect.any(Number),
               })
-            );
-          });
-
+            )
+          })
         });
     });
-
+    
     test("latest comment should be first (in descending order)", () => {
       return request(app)
-        .get("/api/articles/1/comments")
-        .expect(200)
-        .then(({ body: { comments } }) => {
-
-          expect(comments).toBeSorted("created_at", { descending: true, coerce: true });
-
-        });
-    });
-
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        
+        expect(comments).toBeSorted("created_at", { descending: true, coerce: true });
+        
+      });
   });
 
-  describe("204: No content", () => {
-    test("returns no resources found when using a valid article_id that has no comments", () => {
+    test("200: Returns no comments found when using a valid article_id that has no comments", () => {
       return request(app)
         .get("/api/articles/2/comments")
-        .expect(204)
-        .then((res) => {
-          expect(res.body).toEqual({});
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.msg).toEqual("No comments found for this article");
         });
     });
   });
+
+
+  describe("400 Errors", () => {
+    test("404: Invalid article id returns no resources found when using a valid article_id doesn't exist", () => {
+      return request(app)
+        .get("/api/articles/23454656/comments")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toEqual("Resource not found");
+        });
+    });
+    test("400: Invalid article id, returns bad requeest when using an invalid article_id", () => {
+      return request(app)
+        .get("/api/articles/2and5/comments")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toEqual("Bad request - invalid input");
+        })
+      })
+  })
 });
 
 describe("PATCH /api/articles/:article_id", () => {
-
-  describe("200: Success responses", () => {
-    
+  describe("200: Success response", () => {  
     test("updates votes for given article_id and returns the updated article", () => {
       return request(app)
         .patch("/api/articles/1")
         .send({ inc_votes: 2 })
         .expect(200)
         .then(({body: {article}}) => {
-          expect(article.length).toBeGreaterThan(0)
+          expect(article.article_id).toBe(1);
 
-          expect(article[0].article_id).toBe(1);
+          expect(article.votes).toBe(102);
 
-          expect(article[0]).toEqual(expect.objectContaining({
-            article_id: expect.any(Number),
+          expect(article).toEqual(expect.objectContaining({
             title: expect.any(String),
             topic: expect.any(String),
             author: expect.any(String),
             body: expect.any(String),
             created_at: expect.any(String),
-            votes: expect.any(Number),
           }))
         })
     });
   });
-  describe("400: Bad request error", () => {
-    test("invalid article id, not an integer", () => {
+
+  describe("400 Errors", () => {
+    test("400: Bad request - invalid article id, not an integer", () => {
       return request(app)
         .patch("/api/articles/a0f4")
         .send({ inc_votes: 2 })
         .expect(400)
         .then(({ body }) => {
-
           expect(body.msg).toBe("Bad request - invalid input");
-
         });
     });
-
-    test("invalid votes value, not an integer", () => {
+    test("400: Bad request - invalid votes value, not an integer", () => {
       return request(app)
         .patch("/api/articles/1")
         .send({ inc_votes: "two" })
         .expect(400)
         .then(({ body }) => {
-
           expect(body.msg).toBe("Bad request - invalid input");
-
+        });
+    });
+    test("404: Resource not found - invalid article_id in the path, not an integer", () => {
+      return request(app)
+        .patch("/api/articles/9999999")
+        .send({ inc_votes: 2 })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Resource not found");
         });
     });
   });

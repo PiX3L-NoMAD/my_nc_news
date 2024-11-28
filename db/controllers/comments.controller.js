@@ -7,7 +7,7 @@ exports.getCommentsByArticleId = async (req, res, next) => {
         const comments = await selectCommentsByArticleId(article_id)
 
         if (comments.length === 0) {
-            return res.status(204).send()
+            return res.status(200).send({msg: "No comments found for this article" })
         } 
 
         res.status(200).send({ comments });

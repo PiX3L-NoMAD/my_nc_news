@@ -1,3 +1,4 @@
+const { checkExists } = require('../../utils');
 const db = require("../connection");
 
 exports.selectAllArticles = (sort_by = "created_at", order = "desc") => {
@@ -29,21 +30,22 @@ exports.selectAllArticles = (sort_by = "created_at", order = "desc") => {
     })
 };
 
-exports.selectArticleById = (article_id) => {
+exports.selectArticleById = async (article_id) => {
+
+  await checkExists('articles', 'article_id', article_id);
 
   const sqlQuery = `SELECT * FROM articles WHERE article_id = $1;`;
 
   return db
     .query(sqlQuery, [article_id])
     .then(({ rows }) => {
-      if (rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "Article not found"})
-      }
       return rows;
     })
 };
 
-exports.updateArticleById = (article_id, inc_votes) => {
+exports.updateArticleById = async (article_id, inc_votes) => {
+
+  await checkExists('articles', 'article_id', article_id);
 
   const sqlQuery = `
     UPDATE articles
@@ -54,6 +56,6 @@ exports.updateArticleById = (article_id, inc_votes) => {
   return db
     .query(sqlQuery, [inc_votes, article_id])
     .then(({ rows }) => {
-      return rows;
+      return rows[0];
     })
 };
