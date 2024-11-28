@@ -72,6 +72,8 @@ The following is _not_ a comprehensive list! Its purpose is just to get the ball
 
 ### PATCH `/api/comments/:comment_id`
   -
-### DELETE `/api/comments/:comment_id`
 
-- ???
+### DELETE `/api/comments/:comment_id`
+ - 204: No Content - successful comment deletion (returns an empty response)
+ - 400: Bad request - invalid input (e.g. `/api/comments/5and4`)
+ - 404: Not found - valid id but does not exist (e.g. `/api/comments/9999999`)
