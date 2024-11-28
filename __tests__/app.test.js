@@ -114,7 +114,6 @@ describe("GET /api/articles", () => {
 describe("GET /api/articles/:article_id", () => {
 
   describe("200: Success response", () => {
-
     test("returns article based on article_id", () => {
       return request(app)
         .get("/api/articles/2")
@@ -218,6 +217,59 @@ describe("GET /api/articles/:article_id/comments", () => {
         .expect(204)
         .then((res) => {
           expect(res.body).toEqual({});
+        });
+    });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+
+  describe("200: Success responses", () => {
+    
+    test("updates votes for given article_id and returns the updated article", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: 2 })
+        .expect(200)
+        .then(({body: {article}}) => {
+          expect(article.length).toBeGreaterThan(0)
+
+          expect(article[0].article_id).toBe(1);
+
+          expect(article[0]).toEqual(expect.objectContaining({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+          }))
+        })
+    });
+  });
+  describe("400: Bad request error", () => {
+    test("invalid article id, not an integer", () => {
+      return request(app)
+        .patch("/api/articles/a0f4")
+        .send({ inc_votes: 2 })
+        .expect(400)
+        .then(({ body }) => {
+
+          expect(body.msg).toBe("Bad request - invalid input");
+
+        });
+    });
+
+    test("invalid votes value, not an integer", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: "two" })
+        .expect(400)
+        .then(({ body }) => {
+
+          expect(body.msg).toBe("Bad request - invalid input");
+
         });
     });
   });
