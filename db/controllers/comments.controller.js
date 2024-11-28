@@ -1,17 +1,20 @@
 const { selectCommentsByArticleId, addComment } = require('../models/comments.model');
 
-exports.getCommentsByArticleId = (req, res, next) => {
+exports.getCommentsByArticleId = async (req, res, next) => {
     const { article_id } = req.params;
 
-    selectCommentsByArticleId(article_id).then((comments) => {
+    try {
+        const comments = await selectCommentsByArticleId(article_id)
+
         if (comments.length === 0) {
-            res.status(204).send();
-        }
+            return res.status(204).send()
+        } 
+
         res.status(200).send({ comments });
-    })
-    .catch((err) => {
-      next(err);
-    })
+    } catch (err) {
+
+        next(err);
+    }
 };
 
 exports.postCommentByArticleId = (req, res, next) => {

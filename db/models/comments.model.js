@@ -1,6 +1,9 @@
 const db = require("../connection");
+const { checkExists } = require('../../utils');
 
-exports.selectCommentsByArticleId = (article_id) => {
+exports.selectCommentsByArticleId = async (article_id) => {
+
+    await checkExists('articles', 'article_id', article_id);
 
     const sqlQuery = `
     SELECT 
@@ -15,10 +18,8 @@ exports.selectCommentsByArticleId = (article_id) => {
     WHERE comments.article_id = $1
     ORDER BY comments.created_at DESC;`;
   
-    return db.query(sqlQuery, [article_id])
-      .then(({ rows }) => {
-        return rows;
-      })
+    const result = await db.query(sqlQuery, [article_id]);
+    return result.rows;
 }
 
 exports.addComment = (article_id, username, body) => {

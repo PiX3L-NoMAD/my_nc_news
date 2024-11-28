@@ -212,14 +212,12 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 
   describe("204: No content", () => {
-    test("Returns no comments found when using a valid article_id that has no comments", () => {
+    test("returns no resources found when using a valid article_id that has no comments", () => {
       return request(app)
-        .get("/api/articles/23425/comments")
+        .get("/api/articles/2/comments")
         .expect(204)
-        .then(({ body }) => {
-
-          expect(body).toEqual({});
-          
+        .then((res) => {
+          expect(res.body).toEqual({});
         });
     });
   });
