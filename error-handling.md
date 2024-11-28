@@ -46,9 +46,9 @@ The following is _not_ a comprehensive list! Its purpose is just to get the ball
 
 ### PATCH `/api/articles/:article_id`
 
-- Bad `article_id` (e.g. `/dog`)
-- Well formed `article_id` that doesn't exist in the database (e.g. `/999999`)
-- Invalid `inc_votes` (e.g. `{ inc_votes : "cat" }`)
+- 400: Bad `article_id` (e.g. `/dog`)
+- 404: Well formed `article_id` that doesn't exist in the database (e.g. `/999999`)
+- 400: Invalid `inc_votes` (e.g. `{ inc_votes : "cat" }`)
 
 ### POST `/api/articles/:article_id/comments`
 
@@ -71,9 +71,7 @@ The following is _not_ a comprehensive list! Its purpose is just to get the ball
   - `topic` that exists but does not have any articles associated with it
 
 ### PATCH `/api/comments/:comment_id`
-
-- ???
-
+  -
 ### DELETE `/api/comments/:comment_id`
 
 - ???
