@@ -274,3 +274,41 @@ describe("PATCH /api/articles/:article_id", () => {
     });
   });
 });
+
+describe("DELETE /api/comments/:comment_id", () => {
+
+  describe("204: Success response", () => {
+    test("delete comment based on comment_id and returns an empty body", () => {
+      return request(app)
+        .delete("/api/comments/3")
+        .expect(204)
+        .then((response) => {
+          expect(response.body).toEqual({})
+          return db.query('SELECT * FROM comments WHERE comment_id = 3;')
+        })
+        .then(({ rows }) => {
+          expect(rows.length).toBe(0);
+        })
+    });
+  });
+
+  describe("400 Errors:", () => {
+    test("404: Comment_id is valid but doesn't exist", () => {
+      return request(app)
+        .delete("/api/comments/99999999")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Resource not found");
+        });
+    });
+
+    test("400: Invalid comment_id, not an integer", () => {
+      return request(app)
+      .delete("/api/comments/5and4")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request - invalid input");
+      });
+    });
+  });
+});
