@@ -6,7 +6,30 @@
     "description": "serves an array of all topics",
     "queries": [],
     "exampleResponse": {
-      "topics": [{ "slug": "football", "description": "Footie!" }]
+      "topics": [
+        { "slug": "football", 
+        "description": "Footie!" },
+        { "slug": "food", 
+        "description": "All about the food we wish we could eat more of!" }
+      ]
+    }
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        { 
+        "username": "user1", 
+        "name": "Jenny",
+        "avatar_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png" 
+        },
+        { 
+        "username": "user2", 
+        "name": "Adam", 
+        "avatar_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png" 
+        } 
+      ]
     }
   },
   "GET /api/articles": {

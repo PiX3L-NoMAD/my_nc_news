@@ -4,6 +4,7 @@ const app = require("../app");
 const db = require("../db/connection");
 const data = require("../db/data/test-data/index");
 const seed = require("../db/seeds/seed");
+const { string } = require("pg-format");
 
 beforeEach(() => seed(data));
 
@@ -39,18 +40,19 @@ describe("GET /api/topics", () => {
   });
 });
 
-describe("GET /api/topics", () => {
-  test("200: Responds with an array of all topic objects", () => {
+describe("GET /api/users", () => {
+  test("200: Responds with an array of all user objects", () => {
     return request(app)
-      .get("/api/topics")
+      .get("/api/users")
       .expect(200)
-      .then(({ body: { topics } }) => {
+      .then(({ body: { users } }) => {
 
-        expect(topics.length).toBeGreaterThan(0);
+        expect(users.length).toBeGreaterThan(0);
 
-        topics.forEach((topic) => {
-          expect(topic).toHaveProperty("slug");
-          expect(topic).toHaveProperty("description");
+        users.forEach((user) => {
+          expect(user).toHaveProperty("username", expect.any(String));
+          expect(user).toHaveProperty("name", expect.any(String));
+          expect(user).toHaveProperty("avatar_url", expect.any(String));
         });
       });
   });
@@ -427,3 +429,23 @@ describe("DELETE /api/comments/:comment_id", () => {
     });
   });
 });
+
+describe("ERRORS", () => {
+  test("404: Path not found", () => {
+    return request(app)
+      .get("/api/userrs")
+      .expect(404)
+      .then(( { body } ) => {
+        expect(body.msg).toBe("Path not found")
+      })
+  })
+  test("404: Path not found", () => {
+    return request(app)
+      .get("/appi/users")
+      .expect(404)
+      .then(( { body } ) => {
+        expect(body.msg).toBe("Path not found")
+      })
+  })
+
+})
