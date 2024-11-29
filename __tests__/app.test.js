@@ -4,7 +4,6 @@ const app = require("../app");
 const db = require("../db/connection");
 const data = require("../db/data/test-data/index");
 const seed = require("../db/seeds/seed");
-const { string } = require("pg-format");
 
 beforeEach(() => seed(data));
 
@@ -95,6 +94,16 @@ describe("GET /api/articles", () => {
         .then(({ body: { articles } }) => {
 
           expect(articles).toBeSortedBy("created_at", { descending: true, coerce: true });
+          
+        });
+      });
+    test("should be sorted by created_at by default, if only order is provided - ascending", () => {
+      return request(app)
+        .get("/api/articles?order=asc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+
+          expect(articles).toBeSortedBy("created_at", { ascending: true, coerce: true });
 
         });
     });
@@ -165,16 +174,6 @@ describe("GET /api/articles", () => {
         .then(({ body: { articles } }) => {
 
           expect(articles).toBeSortedBy("author", { ascending: true, coerce: true });
-
-        });
-    });
-    test("should be sorted by created_at by default, if only order is provided - ascending", () => {
-      return request(app)
-        .get("/api/articles?order=asc")
-        .expect(200)
-        .then(({ body: { articles } }) => {
-
-          expect(articles).toBeSortedBy("created_at", { ascending: true, coerce: true });
 
         });
     });
@@ -519,19 +518,10 @@ describe("DELETE /api/comments/:comment_id", () => {
 describe("ERRORS", () => {
   test("404: Path not found", () => {
     return request(app)
-      .get("/api/userrs")
+      .get("/not-a-path")
       .expect(404)
       .then(( { body } ) => {
         expect(body.msg).toBe("Path not found")
       })
   })
-  test("404: Path not found", () => {
-    return request(app)
-      .get("/appi/users")
-      .expect(404)
-      .then(( { body } ) => {
-        expect(body.msg).toBe("Path not found")
-      })
-  })
-
 })
