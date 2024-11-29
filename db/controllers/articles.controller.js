@@ -1,12 +1,15 @@
 const endpoints = require('../../endpoints.json');
-const { selectAllArticles, selectArticleById, updateArticleById } = require('../models/articles.model');
+const { selectAllArticles, selectArticlesByTopic, selectArticleById, updateArticleById } = require('../models/articles.model');
 
 exports.getArticles = (req, res, next) => {
-  const { sort_by, order } = req.query;
+  const { sort_by, order, topic } = req.query;
 
-  selectAllArticles(sort_by, order)
+  selectAllArticles(sort_by, order, topic)
     .then((articles) => {
-      res.status(200).send({ articles });
+      if (articles.length === 0) {
+        res.status(200).send({ msg: "No articles found for this topic" });
+      }
+      res.status(200).send({ articles: articles });
     })
     .catch((err) => {
       next(err);

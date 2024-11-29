@@ -58,9 +58,8 @@ describe("GET /api/users", () => {
 });
 
 describe("GET /api/articles", () => {
-
   describe("200: Success responses", () => {
-    test("responds with an array of all article objects, including comments_count", () => {
+    test("All articles: responds with an array of all article objects, including comments_count", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
@@ -87,7 +86,27 @@ describe("GET /api/articles", () => {
           });
         });
     });
-    test("should be sorted by created_at in descending order", () => {
+    test("Topic query: should filter articles by given topic", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then(({ body: { articles } }) => { 
+          expect(articles.length).toBeGreaterThan(0);
+
+          expect(articles).toBeSortedBy("created_at", { descending: true, coerce: true });
+
+          articles.forEach((article) => {
+              expect(article).toHaveProperty("article_id", expect.any(Number));
+              expect(article).toHaveProperty("title", expect.any(String));
+              expect(article.topic).toBe("mitch");
+              expect(article).toHaveProperty("author", expect.any(String));
+              expect(article).toHaveProperty("created_at", expect.any(String));
+              expect(article).toHaveProperty("votes", expect.any(Number));
+              expect(article).toHaveProperty("article_img_url", expect.any(String));
+          });
+        });
+    });
+    test("Sort_by query: should be sorted by created_at in descending order", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
@@ -96,8 +115,8 @@ describe("GET /api/articles", () => {
           expect(articles).toBeSortedBy("created_at", { descending: true, coerce: true });
           
         });
-      });
-    test("should be sorted by created_at by default, if only order is provided - ascending", () => {
+    });
+    test("Order query: should be sorted by created_at by default, if only order is provided - ascending", () => {
       return request(app)
         .get("/api/articles?order=asc")
         .expect(200)
@@ -106,6 +125,27 @@ describe("GET /api/articles", () => {
           expect(articles).toBeSortedBy("created_at", { ascending: true, coerce: true });
 
         });
+    });
+    test("Topic-Sort_By-Order combo: should be sorted by article_id in descending order", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch&sort_by=comment_count&order=asc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles.length).toBeGreaterThan(0);
+
+          expect(articles).toBeSortedBy("comment_count", { ascending: true, coerce: true });
+
+          articles.forEach((article) => {
+            expect(article.topic).toBe("mitch");
+            expect(article).toHaveProperty("article_id", expect.any(Number));
+            expect(article).toHaveProperty("title", expect.any(String));
+            expect(article).toHaveProperty("author", expect.any(String));
+            expect(article).toHaveProperty("created_at", expect.any(String));
+            expect(article).toHaveProperty("votes", expect.any(Number));
+            expect(article).toHaveProperty("comment_count", expect.any(Number));
+            expect(article).toHaveProperty("article_img_url", expect.any(String));
+          });
+      });
     });
     test("should be sorted by article_id in descending order", () => {
       return request(app)
@@ -178,9 +218,8 @@ describe("GET /api/articles", () => {
         });
     });
   });
-
-  describe("400: Bad request errors", () => {
-    test("sort_by error, queried column doesn't exist", () => {
+  describe("Errors:", () => {
+    test("400: sort_by error, queried column doesn't exist", () => {
       return request(app)
         .get("/api/articles?sort_by=bananas")
         .expect(400)
@@ -190,7 +229,7 @@ describe("GET /api/articles", () => {
 
         });
     });
-    test("order error, value is not allowed", () => {
+    test("400: order error, value is not allowed", () => {
       return request(app)
         .get("/api/articles?sort_by=created_at&order=dasc")
         .expect(400)
@@ -200,7 +239,7 @@ describe("GET /api/articles", () => {
 
         });
     });
-    test("order error, value is not allowed (order only)", () => {
+    test("400: order error, value is not allowed (order only)", () => {
       return request(app)
         .get("/api/articles?order=dasc")
         .expect(400)
@@ -210,9 +249,24 @@ describe("GET /api/articles", () => {
 
         });
     });
-  });
-
-});
+    test("200: should give an array of all articles if given topic doesn't exist", () => {
+      return request(app)
+        .get("/api/articles?topic=habbory")
+        .expect(200)
+        .then(({ body: { articles } }) => { 
+          expect(articles.length).toBeGreaterThan(0);
+        })
+    });
+    test("200: should give an empty array of all articles if given topic exists but has no articles", () => {
+      return request(app)
+        .get("/api/articles?topic=paper")
+        .expect(200)
+        .then(({ body }) => { 
+          expect(body.msg).toBe("No articles found for this topic")
+        })
+    });
+  })
+})
 
 describe("GET /api/articles/:article_id", () => {
 
@@ -316,7 +370,6 @@ describe("GET /api/articles/:article_id/comments", () => {
     });
   });
 
-
   describe("400 Errors", () => {
     test("404: Invalid article id returns no resources found when using a valid article_id doesn't exist", () => {
       return request(app)
@@ -333,7 +386,7 @@ describe("GET /api/articles/:article_id/comments", () => {
         .then(({ body }) => {
           expect(body.msg).toEqual("Bad request - invalid input");
         })
-      })
+    })
   })
 });
 
@@ -362,19 +415,19 @@ describe("POST /api/articles/:article_id/comments", () => {
   describe("400 Errors", () => {
     test("400: Returns 400 error if no body provided", () => {
       const input = { username: "rogersop" }
-  
+
       return request(app)
         .post("/api/articles/1/comments")
         .send(input)
         .expect(400)
         .then(({ body }) => {
           expect(body.msg).toBe("Bad request - invalid input");
-        });
+      });
     });
     test("404: Returns 404 error if no username provided", () => {
-  
+
       const input = { body: "In my humble opinion, I prefer beans." }
-  
+
       return request(app)
         .post("/api/articles/1/comments")
         .send(input)
@@ -384,9 +437,9 @@ describe("POST /api/articles/:article_id/comments", () => {
         });
     });
     test("400: Returns 400 error if article_id is invalid", () => {
-  
+
       const input = { username: "rogersop", body: "In my humble opinion, I prefer beans." }
-  
+
       return request(app)
         .post("/api/articles/a1o5/comments")
         .send(input)
@@ -396,9 +449,9 @@ describe("POST /api/articles/:article_id/comments", () => {
         });
     });
     test("404: Returns 404 resource not found if article doesn't exist", () => {
-  
+
       const input = { username: "rogersop", body: "In my humble opinion, I prefer beans." }
-  
+
       return request(app)
         .post("/api/articles/999999/comments")
         .send(input)
@@ -406,20 +459,20 @@ describe("POST /api/articles/:article_id/comments", () => {
         .then(({ body }) => {
             expect(body.msg).toBe("Resource not found");
         });
-     });
-  });
-  test("404: Returns 404 resource not found if valid username doesn't exist", () => {
-  
-    const input = { username: "bibbieboo", body: "In my humble opinion, I prefer beans." }
+    });
+    test("404: Returns 404 resource not found if valid username doesn't exist", () => {
+    
+      const input = { username: "bibbieboo", body: "In my humble opinion, I prefer beans." }
 
-    return request(app)
-      .post("/api/articles/1/comments")
-      .send(input)
-      .expect(404)
-      .then(({ body }) => {
-          expect(body.msg).toBe("Resource not found");
-      });
-   });
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(input)
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Resource not found");
+        });
+    });
+  })
 })
 
 
