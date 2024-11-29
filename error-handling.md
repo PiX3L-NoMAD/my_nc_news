@@ -33,7 +33,7 @@ The following is _not_ a comprehensive list! Its purpose is just to get the ball
 
 ### GET `/not-a-route`
 
-- Status: 404
+- Status: 404 - Path not found (e.g. `/appi` or `/api/ussers`)
 
 ---
 
@@ -77,3 +77,4 @@ The following is _not_ a comprehensive list! Its purpose is just to get the ball
  - 204: No Content - successful comment deletion (returns an empty response)
  - 400: Bad request - invalid input (e.g. `/api/comments/5and4`)
  - 404: Not found - valid id but does not exist (e.g. `/api/comments/9999999`)
+ 

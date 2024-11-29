@@ -3,6 +3,7 @@ const { getApi } = require('./db/controllers/app.controller');
 const { getArticles, getArticleById, patchByArticleId } = require('./db/controllers/articles.controller');
 const { getCommentsByArticleId, postCommentByArticleId, deleteCommentByCommentId } = require('./db/controllers/comments.controller');
 const { getTopics }= require('./db/controllers/topics.controller');
+const { getUsers }= require('./db/controllers/users.controller');
 const { badPathErrorHandler, postgresErrorHandler, customErrorHandler, serverErrorHandler } = require('./errors/errors');
 
 const express = require('express');
@@ -13,6 +14,8 @@ app.use(express.json());
 app.get('/api', getApi);
 
 app.get('/api/topics', getTopics);
+
+app.get('/api/users', getUsers);
 
 app.get('/api/articles', getArticles);
 
