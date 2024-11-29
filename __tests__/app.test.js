@@ -35,7 +35,23 @@ describe("GET /api/topics", () => {
           expect(topic).toHaveProperty("slug");
           expect(topic).toHaveProperty("description");
         });
+      });
+  });
+});
 
+describe("GET /api/topics", () => {
+  test("200: Responds with an array of all topic objects", () => {
+    return request(app)
+      .get("/api/topics")
+      .expect(200)
+      .then(({ body: { topics } }) => {
+
+        expect(topics.length).toBeGreaterThan(0);
+
+        topics.forEach((topic) => {
+          expect(topic).toHaveProperty("slug");
+          expect(topic).toHaveProperty("description");
+        });
       });
   });
 });
@@ -233,6 +249,92 @@ describe("GET /api/articles/:article_id/comments", () => {
       })
   })
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  describe("200: Successful responses", () => {
+    test("201: Returns 201 when post has been added to the article of give article_id ", () => {
+
+      const input = { username: "rogersop", body: "In my humble opinion, I prefer beans." }
+
+      return request(app)
+        .post("/api/articles/2/comments")
+        .send(input)
+        .expect(201)
+        .then(({ body }) => {
+            expect(body.comment[0]).toEqual({
+              comment_id: expect.any(Number),
+              article_id: 2,
+              author: "rogersop",
+              body: "In my humble opinion, I prefer beans.",
+              votes: 0,
+              created_at: expect.any(String),
+            });
+        });
+    });
+  })
+  describe("400 Errors", () => {
+    test("400: Returns 400 error if no body provided", () => {
+      const input = { username: "rogersop" }
+  
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(input)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request - invalid input");
+        });
+    });
+    test("404: Returns 404 error if no username provided", () => {
+  
+      const input = { body: "In my humble opinion, I prefer beans." }
+  
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(input)
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Resource not found");
+        });
+    });
+    test("400: Returns 400 error if article_id is invalid", () => {
+  
+      const input = { username: "rogersop", body: "In my humble opinion, I prefer beans." }
+  
+      return request(app)
+        .post("/api/articles/a1o5/comments")
+        .send(input)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request - invalid input");
+        });
+    });
+    test("404: Returns 404 resource not found if article doesn't exist", () => {
+  
+      const input = { username: "rogersop", body: "In my humble opinion, I prefer beans." }
+  
+      return request(app)
+        .post("/api/articles/999999/comments")
+        .send(input)
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Resource not found");
+        });
+     });
+  });
+  test("404: Returns 404 resource not found if valid username doesn't exist", () => {
+  
+    const input = { username: "bibbieboo", body: "In my humble opinion, I prefer beans." }
+
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(input)
+      .expect(404)
+      .then(({ body }) => {
+          expect(body.msg).toBe("Resource not found");
+      });
+   });
+})
+
 
 describe("PATCH /api/articles/:article_id", () => {
   describe("200: Success response", () => {  

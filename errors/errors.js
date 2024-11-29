@@ -3,7 +3,7 @@ exports.badPathErrorHandler = (req, res, next) => {
 };
 
 exports.postgresErrorHandler = (err, req, res, next) => {
-    if (err.code === '22P02') {
+    if (err.code === '22P02' || err.code === '23502') {
         return res.status(400).send({msg: "Bad request - invalid input"})
     } else {
         next(err);

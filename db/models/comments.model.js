@@ -24,6 +24,7 @@ exports.selectCommentsByArticleId = async (article_id) => {
 exports.addComment = async (article_id, username, body) => {
     
     await checkExists('articles', 'article_id', article_id);
+    await checkExists('users', 'username', username);
 
     const sqlQuery = `
         INSERT INTO comments 
@@ -32,7 +33,7 @@ exports.addComment = async (article_id, username, body) => {
         RETURNING *;`;
 
     return db.query(sqlQuery, [article_id, username, body]).then(({ rows }) => {
-        return rows[0];
+        return rows;
     })
 }
 
