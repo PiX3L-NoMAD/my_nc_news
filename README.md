@@ -1,30 +1,31 @@
 # Northcoders News API
 ## Hosted version of this API:
-    [Janilee's NC News Project](https://janilees-northcoders-project.onrender.com/api/)
+    [Janilee's NC News project](https://janilees-northcoders-project.onrender.com/api)
+    
 
 ---
 
-## API Description:
-This project is a back-end project created by Janilee Svaerdstaal at the Northcoders Full-Stack Development Bootcamp in 2024/2025. It is an example API showcasing a news page, including articles, topics, registered users and comments that you can GET, PATCH, POST and DELETE.
+## API Description
+This project is a back-end project created by Janilee Svaerdstaal at the Northcoders Full-Stack Javascript Development Bootcamp in 2024/2025. It represents the back-end of a news site. This API provides access to databases of articles, topics, registered users and comments that can be accessed through GET, PATCH, POST and DELETE HTTP requests.
 
 ---
 ## Getting Started
-To use this project as your own please fork this repo at [GitHub project](https://github.com/PiX3L-NoMAD/my_nc_news)
+To use this project locally please fork this repo at [GitHub project](https://github.com/PiX3L-NoMAD/my_nc_news)
 Once forked, copy the link from your forked repo and in your computer's terminal input:
     git clone <link-to-your-repo>
-    cd <repo-folder>
+    cd <cloned-repo-folder>
     code .
 
 ### Dependencies Needed
 Ensure you have the following installed:
 
-* Node
-* PostgreSQL
-* PF-Format
+* Node.js (minimum version: v18.0.0)
+* PostgreSQL (minimum version: v12.0.0)
+* PG-Format
 * Express
 * DotEnv
 
-#### You can install all dependencies by typing in your terminal:
+#### You can install all dependencies of this project by typing in your terminal:
     npm install
 
 In order to access the databases, create the files:
@@ -45,16 +46,16 @@ Change the name to your database name for testing (a smaller database)
 
 Change the name to your development database (a larger test database)
 
-### Set up the database
+## Setting up the project
     npm run setup-dbs
 
-### Run the seed
+### Seed the database
     npm run seed
 
-### Start the server
+### Optional: Start the server
     npm start
 
-## Test Instructions
+#### Testing
 You will also need to ensure you install some devDependencies for testing purposes:
 
 ## Dev Dependencies Needed
@@ -63,10 +64,10 @@ You will also need to ensure you install some devDependencies for testing purpos
     * Jest-sorted
     * Supertest
 
-To check which dependencies are installed, in your terminal input:
+To check the status of the project dependencies on your machine, put in your terminal:
     npm list
 
-The end of your package.json file should look like this:
+The end of your package.json file should look something like this:
 
     "dependencies": {
         "dotenv": "^16.0.0",
