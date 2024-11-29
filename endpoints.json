@@ -34,7 +34,14 @@
   },
   "GET /api/articles": {
     "description": "serves an array of all articles, ignoring the body-property, and adding comment_count based on each articles article_id, by default the list will be ordered by the created_at time stamp in descending order. It can be queried using sort_by and order",
-    "queries": [ "sort_by", "order" ],
+    "queries": { 
+      "sort_by": [ "article_id", "title", "author", "topic", "created_at", "votes", "comment_count" ], 
+      "order": ["ASC", "DESC"]
+    },
+    "defaultQueries": {
+      "sort_by": "created_at",
+      "order": "desc"
+    },
     "exampleResponse": {
       "articles": [
         {
