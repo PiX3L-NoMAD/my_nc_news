@@ -1,17 +1,25 @@
-const endpointsJson = require('./endpoints.json');
-const { getApi } = require('./db/controllers/app.controller');
-const { getArticles, getArticleById, patchByArticleId } = require('./db/controllers/articles.controller');
-const { getCommentsByArticleId, postCommentByArticleId, deleteCommentByCommentId } = require('./db/controllers/comments.controller');
-const { getTopics }= require('./db/controllers/topics.controller');
-const { getUsers }= require('./db/controllers/users.controller');
+const express = require('express');
+const apiRouter = require("./routes/api-router");
 const { badPathErrorHandler, postgresErrorHandler, customErrorHandler, serverErrorHandler } = require('./errors/errors');
 
-const express = require('express');
 const app = express();
 
 app.use(express.json());
 
-app.get('/api', getApi);
+app.use("/api", apiRouter);
+
+app.all('*', badPathErrorHandler);
+
+app.use(postgresErrorHandler);
+
+app.use(customErrorHandler);
+
+app.use(serverErrorHandler);
+
+
+module.exports = app;
+
+/* app.get('/api', getApi);
 
 app.get('/api/topics', getTopics);
 
@@ -27,14 +35,4 @@ app.get('/api/articles/:article_id/comments', getCommentsByArticleId);
 
 app.post('/api/articles/:article_id/comments', postCommentByArticleId);
 
-app.delete('/api/comments/:comment_id', deleteCommentByCommentId);
-
-app.all('*', badPathErrorHandler);
-
-app.use(postgresErrorHandler);
-
-app.use(customErrorHandler);
-
-app.use(serverErrorHandler);
-
-module.exports = app;
+app.delete('/api/comments/:comment_id', deleteCommentByCommentId); */
