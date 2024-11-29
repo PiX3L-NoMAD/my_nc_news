@@ -32,6 +32,19 @@
       ]
     }
   },
+  "GET /api/users/:username": {
+    "description": "Serves a single user object",
+    "parameters": ["username"],
+    "queries": [],
+    "exampleResponse": {
+      "user":
+      {
+        "name": "jackie",
+        "username": "jjjjackie",
+        "avatar_url": "https://awebsite.org/randompic.jpg"
+      }
+    }
+  },
   "GET /api/articles": {
     "description": "serves an array of all articles, ignoring the body-property, and adding comment_count based on each articles article_id, by default the list will be ordered by the created_at time stamp in descending order. It can be queried using sort_by, order and topic. If no topic is provided it will serve all articles.",
     "queries": { 

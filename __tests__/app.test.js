@@ -57,6 +57,30 @@ describe("GET /api/users", () => {
   });
 });
 
+describe("GET /api/users/:username", () => {
+  test("200: Returns a single user object based on given username", () => {
+    return request(app)
+      .get("/api/users/rogersop")
+      .expect(200)
+      .then(({ body: { user } }) => {
+          expect(user).toHaveProperty("name", expect.any(String));
+          expect(user).toHaveProperty("username", expect.any(String));
+          expect(user).toHaveProperty("avatar_url", expect.any(String));
+          
+          expect(user.name).toBe("paul");
+          expect(user.username).toBe("rogersop");
+          expect(user.avatar_url).toBe("https://avatars2.githubusercontent.com/u/24394918?s=400&v=4");
+      });
+  });
+  test("404: User not found, valid username but doesn't exist", () => {
+    return request(app)
+      .get("/api/users/notausername")
+      .expect(404)
+      .then(({ body }) => {
+          expect(body.msg).toBe("notausername not found in the users data")});
+  });
+});
+
 describe("GET /api/articles", () => {
   describe("200: Success responses", () => {
     test("All articles: responds with an array of all article objects, including comments_count", () => {
@@ -305,13 +329,13 @@ describe("GET /api/articles/:article_id", () => {
 
   describe("404: Not found error", () => {
 
-    test("resource not found for valid id that doesn't exist", () => {
+    test("article_id not found in the articles data for valid id that doesn't exist", () => {
       return request(app)
         .get("/api/articles/123456789")
         .expect(404)
         .then(({ body }) => {
 
-          expect(body.msg).toBe("Resource not found");
+          expect(body.msg).toBe("123456789 not found in the articles data");
 
         });
     });
@@ -372,7 +396,7 @@ describe("GET /api/articles/:article_id/comments", () => {
         .get("/api/articles/23454656/comments")
         .expect(404)
         .then(({ body }) => {
-          expect(body.msg).toEqual("Resource not found");
+          expect(body.msg).toEqual("23454656 not found in the articles data");
         });
     });
     test("400: Invalid article id, returns bad requeest when using an invalid article_id", () => {
@@ -429,7 +453,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         .send(input)
         .expect(404)
         .then(({ body }) => {
-            expect(body.msg).toBe("Resource not found");
+            expect(body.msg).toBe("undefined not found in the users data");
         });
     });
     test("400: Returns 400 error if article_id is invalid", () => {
@@ -444,7 +468,7 @@ describe("POST /api/articles/:article_id/comments", () => {
           expect(body.msg).toBe("Bad request - invalid input");
         });
     });
-    test("404: Returns 404 resource not found if article doesn't exist", () => {
+    test("404: Returns 404 1 not found in the articles data if article doesn't exist", () => {
 
       const input = { username: "rogersop", body: "In my humble opinion, I prefer beans." }
 
@@ -453,10 +477,10 @@ describe("POST /api/articles/:article_id/comments", () => {
         .send(input)
         .expect(404)
         .then(({ body }) => {
-            expect(body.msg).toBe("Resource not found");
+            expect(body.msg).toBe("999999 not found in the articles data");
         });
     });
-    test("404: Returns 404 resource not found if valid username doesn't exist", () => {
+    test("404: Returns 404 1 not found in the articles data if valid username doesn't exist", () => {
     
       const input = { username: "bibbieboo", body: "In my humble opinion, I prefer beans." }
 
@@ -465,7 +489,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         .send(input)
         .expect(404)
         .then(({ body }) => {
-            expect(body.msg).toBe("Resource not found");
+            expect(body.msg).toBe("bibbieboo not found in the users data");
         });
     });
   })
@@ -514,13 +538,13 @@ describe("PATCH /api/articles/:article_id", () => {
           expect(body.msg).toBe("Bad request - invalid input");
         });
     });
-    test("404: Resource not found - invalid article_id in the path, not an integer", () => {
+    test("404: 9999999 not found in the articles data - invalid article_id in the path, not an integer", () => {
       return request(app)
         .patch("/api/articles/9999999")
         .send({ inc_votes: 2 })
         .expect(404)
         .then(({ body }) => {
-          expect(body.msg).toBe("Resource not found");
+          expect(body.msg).toBe("9999999 not found in the articles data");
         });
     });
   });
@@ -549,7 +573,7 @@ describe("DELETE /api/comments/:comment_id", () => {
         .delete("/api/comments/99999999")
         .expect(404)
         .then(({ body }) => {
-          expect(body.msg).toBe("Resource not found");
+          expect(body.msg).toBe("99999999 not found in the comments data");
         });
     });
 
