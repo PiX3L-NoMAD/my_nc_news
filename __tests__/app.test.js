@@ -61,7 +61,6 @@ describe("GET /api/users", () => {
 describe("GET /api/articles", () => {
 
   describe("200: Success responses", () => {
-
     test("responds with an array of all article objects, including comments_count", () => {
       return request(app)
         .get("/api/articles")
@@ -89,7 +88,6 @@ describe("GET /api/articles", () => {
           });
         });
     });
-
     test("should be sorted by created_at in descending order", () => {
       return request(app)
         .get("/api/articles")
@@ -100,10 +98,89 @@ describe("GET /api/articles", () => {
 
         });
     });
+    test("should be sorted by article_id in descending order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=article_id")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+
+          expect(articles).toBeSortedBy("article_id", { descending: true, coerce: true });
+
+        });
+    });
+    test("should be sorted by title in descending order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+
+          expect(articles).toBeSortedBy("title", { descending: true, coerce: true });
+
+        });
+    });
+    test("should be sorted by votes in descending order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=votes")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+
+          expect(articles).toBeSortedBy("votes", { descending: true, coerce: true });
+
+        });
+    });
+    test("should be sorted by author in descending order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=author")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+
+          expect(articles).toBeSortedBy("author", { descending: true, coerce: true });
+
+        });
+    });
+    test("should be sorted by topic in descending order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=topic")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+
+          expect(articles).toBeSortedBy("topic", { descending: true, coerce: true });
+
+        });
+    });
+    test("should be sorted by author in ascending order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=author&order=asc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+
+          expect(articles).toBeSortedBy("author", { ascending: true, coerce: true });
+
+        });
+    });
+    test("should be sorted by author in uppercase ascending order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=author&order=ASC")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+
+          expect(articles).toBeSortedBy("author", { ascending: true, coerce: true });
+
+        });
+    });
+    test("should be sorted by created_at by default, if only order is provided - ascending", () => {
+      return request(app)
+        .get("/api/articles?order=asc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+
+          expect(articles).toBeSortedBy("created_at", { ascending: true, coerce: true });
+
+        });
+    });
   });
 
   describe("400: Bad request errors", () => {
-    
     test("sort_by error, queried column doesn't exist", () => {
       return request(app)
         .get("/api/articles?sort_by=bananas")
@@ -114,10 +191,19 @@ describe("GET /api/articles", () => {
 
         });
     });
-
     test("order error, value is not allowed", () => {
       return request(app)
         .get("/api/articles?sort_by=created_at&order=dasc")
+        .expect(400)
+        .then(({ body }) => {
+
+          expect(body.msg).toBe("Invalid query");
+
+        });
+    });
+    test("order error, value is not allowed (order only)", () => {
+      return request(app)
+        .get("/api/articles?order=dasc")
         .expect(400)
         .then(({ body }) => {
 

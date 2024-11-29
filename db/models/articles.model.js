@@ -1,11 +1,11 @@
 const { checkExists } = require('../../utils');
 const db = require("../connection");
 
-exports.selectAllArticles = (sort_by = "created_at", order = "desc") => {
-  const validSortBy = "created_at";
-  const validOrder = ["asc", "desc"];
+exports.selectAllArticles = (sort_by = "created_at", order = "DESC") => {
+  const validSortBy = [ "article_id", "title", "author", "topic", "created_at", "votes", "comment_count" ];
+  const validOrder = ["ASC", "DESC"];
 
-  if (!validSortBy.includes(sort_by) || !validOrder.includes(order)) {
+  if (!validSortBy.includes(sort_by.toLowerCase()) || !validOrder.includes(order.toUpperCase())) {
     return Promise.reject({ status: 400, msg: "Invalid query" });
   }
 
