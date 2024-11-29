@@ -276,19 +276,15 @@ describe("GET /api/articles/:article_id", () => {
         .get("/api/articles/2")
         .expect(200)
         .then(({ body: { article } }) => {
-
-          expect(article.length).toBeGreaterThan(0);
-
-          expect(article[0].article_id).toBe(2);
-
-          expect(article[0]).toHaveProperty("title");
-          expect(article[0]).toHaveProperty("topic");
-          expect(article[0]).toHaveProperty("author");
-          expect(article[0]).toHaveProperty("body");
-          expect(article[0]).toHaveProperty("created_at");
-          expect(article[0]).toHaveProperty("votes");
-          expect(article[0]).toHaveProperty("article_img_url");
-
+          expect(article).toHaveProperty("article_id", 2);
+          expect(article).toHaveProperty("title", expect.any(String));
+          expect(article).toHaveProperty("body", expect.any(String));
+          expect(article).toHaveProperty("author", expect.any(String));
+          expect(article).toHaveProperty("topic", expect.any(String));
+          expect(article).toHaveProperty("created_at", expect.any(String));
+          expect(article).toHaveProperty("votes", expect.any(Number));
+          expect(article).toHaveProperty("article_img_url", expect.any(String));
+          expect(article).toHaveProperty("comment_count", expect.any(Number));
         });
     });
   });
