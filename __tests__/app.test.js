@@ -588,6 +588,57 @@ describe("DELETE /api/comments/:comment_id", () => {
   });
 });
 
+describe("PATCH /api/comments/:comment_id", () => {
+
+  describe("Success response", () => {
+    test("200: Updates votes on a comment based on comment_id and returns the updated comment", () => {
+      return request(app)
+        .patch("/api/comments/3")
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then(( { body: {comment} } ) => {
+          expect(comment.votes).toBe(101);
+          expect(comment.comment_id).toBe(3);
+          expect(comment.article_id).toBe(1);
+          expect(comment.author).toBe("icellusedkars");
+
+          expect(comment).toHaveProperty("body", expect.any(String));
+          expect(comment).toHaveProperty("created_at", expect.any(String));
+        });
+      })  
+  })
+
+  describe("Errors:", () => {
+    test("400: Bad request - inc_votes is invalid, not a number", () => {
+      return request(app)
+        .patch("/api/comments/1")
+        .send({ inc_votes: 'one' })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request - invalid input");
+        });
+    });
+    test("404: comment_id is valid but doesn't exist", () => {
+      return request(app)
+        .patch("/api/comments/9999999")
+        .send({ inc_votes: 1 })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("9999999 not found in the comments data");
+        });
+    });
+    test("400: inc_votes is missing", () => {
+      return request(app)
+        .patch("/api/comments/1")
+        .send({})
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request - invalid input");
+        });
+    });
+  });
+});
+
 describe("ERRORS", () => {
   test("404: Path not found", () => {
     return request(app)

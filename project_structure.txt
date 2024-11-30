@@ -1,0 +1,45 @@
+.
+├── app.js
+├── db
+│   ├── connection.js
+│   ├── controllers
+│   │   ├── articles.controller.js
+│   │   ├── comments.controller.js
+│   │   ├── topics.controller.js
+│   │   └── users.controller.js
+│   ├── data
+│   │   ├── development-data
+│   │   └── test-data
+│   ├── models
+│   │   ├── app.model.js
+│   │   ├── articles.model.js
+│   │   ├── comments.model.js
+│   │   ├── topics.model.js
+│   │   └── users.model.js
+│   ├── seeds
+│   │   ├── run-seed.js
+│   │   ├── seed.js
+│   │   └── utils.js
+│   └── setup.sql
+├── echo
+├── endpoints.json
+├── error-handling.md
+├── errors
+│   └── errors.js
+├── listen.js
+├── package.json
+├── package-lock.json
+├── project_structure.txt
+├── README.md
+├── routes
+│   ├── api-router.js
+│   ├── articles-router.js
+│   ├── comments-router.js
+│   ├── topics-router.js
+│   └── users-router.js
+├── __tests__
+│   ├── app.test.js
+│   └── utils.test.js
+└── utils.js
+
+11 directories, 32 files

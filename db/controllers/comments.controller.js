@@ -1,4 +1,4 @@
-const { selectCommentsByArticleId, addComment, deleteComment } = require('../models/comments.model');
+const { selectCommentsByArticleId, addComment, deleteComment, patchCommentVotes } = require('../models/comments.model');
 
 exports.getCommentsByArticleId = async (req, res, next) => {
     const { article_id } = req.params;
@@ -30,13 +30,26 @@ exports.postCommentByArticleId = (req, res, next) => {
         });
 };
 
-exports.deleteCommentByCommentId= (req, res, next) => {
+exports.deleteCommentByCommentId = (req, res, next) => {
     const { comment_id } = req.params;
 
-        deleteComment(comment_id).then(() => {
+    deleteComment(comment_id).then(() => {
             res.status(204).send();
-        })
+    })
     .catch((err) => {
         next(err);
     })
 }
+
+exports.updateCommentVotes = (req, res, next) => {
+    const { comment_id } = req.params;
+    const { inc_votes } = req.body;
+
+    patchCommentVotes(comment_id, inc_votes)
+        .then((updatedComment) => {
+            return res.status(200).send({ comment: updatedComment })   
+        })
+        .catch((err) => {
+            next(err);
+        });
+};
