@@ -50,3 +50,20 @@ exports.deleteComment = async (comment_id) => {
         return rows;
     })
 }
+
+exports.patchCommentVotes = (comment_id, inc_votes) => {
+    return checkExists('comments', 'comment_id', comment_id)
+        .then(()  => {
+            const sqlQuery = `
+                UPDATE comments
+                SET votes = votes + $1
+                WHERE comment_id = $2
+                RETURNING *;
+            `;
+
+            return db.query(sqlQuery, [inc_votes, comment_id])
+                .then(({ rows }) => {
+                    return rows[0];
+                });
+        });
+};
