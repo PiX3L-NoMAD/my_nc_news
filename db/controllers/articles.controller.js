@@ -1,14 +1,15 @@
 const { selectAllArticles, selectArticleById, updateArticleById, insertArticle } = require('../models/articles.model');
 
 exports.getArticles = (req, res, next) => {
-  const { sort_by, order, topic } = req.query;
+  const { limit, p, sort_by, order, topic } = req.query;
 
-  selectAllArticles(sort_by, order, topic)
-    .then((articles) => {
+  selectAllArticles(limit, p, sort_by, order, topic)
+    .then(({ articles, total_count }) => {
       if (articles.length === 0) {
         res.status(200).send({ msg: "No articles found for this topic" });
+      } else {
+        res.status(200).send({ articles: articles, total_count: total_count });
       }
-      res.status(200).send({ articles: articles });
     })
     .catch((err) => {
       next(err);
