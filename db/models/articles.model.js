@@ -1,7 +1,7 @@
 const { checkExists } = require('../../utils');
 const db = require("../connection");
 
-exports.selectAllArticles = (sort_by = "created_at", order = "DESC", topic) => {
+exports.selectAllArticles = (limit = 10, p = 1, sort_by = "created_at", order = "DESC", topic) => {
   const validSortBy = ["article_id", "title", "author", "topic", "created_at", "votes", "comment_count"];
   const validOrder = ["ASC", "DESC"];
   const validTopics = ["cats", "mitch", "paper"];
@@ -10,6 +10,15 @@ exports.selectAllArticles = (sort_by = "created_at", order = "DESC", topic) => {
     return Promise.reject({ status: 400, msg: "Invalid query" });
   }
 
+  const limitNum = Number(limit);
+  const pageNum = Number(p);
+
+  if (isNaN(limitNum) || limitNum < 1 || isNaN(pageNum) || pageNum < 1) {
+    return Promise.reject({ status: 400, msg: "Invalid limit or page number" });
+  };
+
+  const offset = (pageNum - 1) * limitNum;
+
   let sqlQuery = `
     SELECT 
       articles.article_id, 
@@ -17,9 +26,10 @@ exports.selectAllArticles = (sort_by = "created_at", order = "DESC", topic) => {
       articles.author, 
       articles.topic, 
       articles.created_at, 
-      articles.votes, 
+      articles.votes,
       articles.article_img_url, 
-      COUNT(comments.article_id)::INT AS comment_count 
+      COUNT(comments.article_id)::INT AS comment_count,
+      COUNT(*) OVER()::int AS total_count 
     FROM articles 
     LEFT JOIN comments ON articles.article_id = comments.article_id `;
 
@@ -32,11 +42,16 @@ exports.selectAllArticles = (sort_by = "created_at", order = "DESC", topic) => {
 
   sqlQuery += `
     GROUP BY articles.article_id
-    ORDER BY ${sort_by} ${order.toUpperCase()};`;
+    ORDER BY ${sort_by} ${order.toUpperCase()}
+    LIMIT $${queryParams.length + 1} OFFSET $${queryParams.length + 2} `;
 
-  return db.query(sqlQuery, queryParams).then(({ rows }) => {
-    return rows;
-  });
+  queryParams.push(limit, offset);
+
+  return db.query(sqlQuery, queryParams)
+    .then(({ rows }) => {
+      const total_count = rows.length > 0 ? rows[0].total_count : 0;
+      return { articles: rows.map(({total_count, ...rest}) => rest), total_count };
+    });
 };
 
 exports.selectArticleById = async (article_id) => {

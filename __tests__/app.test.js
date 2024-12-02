@@ -196,52 +196,94 @@ describe("GET /api/articles", () => {
         .get("/api/articles?sort_by=votes")
         .expect(200)
         .then(({ body: { articles } }) => {
-
+          
           expect(articles).toBeSortedBy("votes", { descending: true, coerce: true });
-
+          
         });
-    });
-    test("should be sorted by author in descending order", () => {
-      return request(app)
+      });
+      test("should be sorted by author in descending order", () => {
+        return request(app)
         .get("/api/articles?sort_by=author")
         .expect(200)
         .then(({ body: { articles } }) => {
-
+          
           expect(articles).toBeSortedBy("author", { descending: true, coerce: true });
-
+          
         });
-    });
-    test("should be sorted by topic in descending order", () => {
-      return request(app)
+      });
+      test("should be sorted by topic in descending order", () => {
+        return request(app)
         .get("/api/articles?sort_by=topic")
         .expect(200)
         .then(({ body: { articles } }) => {
-
+          
           expect(articles).toBeSortedBy("topic", { descending: true, coerce: true });
-
+          
         });
-    });
-    test("should be sorted by author in ascending order", () => {
-      return request(app)
+      });
+      test("should be sorted by author in ascending order", () => {
+        return request(app)
         .get("/api/articles?sort_by=author&order=asc")
         .expect(200)
         .then(({ body: { articles } }) => {
-
+          
           expect(articles).toBeSortedBy("author", { ascending: true, coerce: true });
-
+          
         });
-    });
-    test("should be sorted by author in uppercase ascending order", () => {
-      return request(app)
+      });
+      test("should be sorted by author in uppercase ascending order", () => {
+        return request(app)
         .get("/api/articles?sort_by=author&order=ASC")
         .expect(200)
         .then(({ body: { articles } }) => {
-
+          
           expect(articles).toBeSortedBy("author", { ascending: true, coerce: true });
-
+          
         });
+      });
+      describe('Pagination query', () => {
+        test('responds with correct number of articles when limit is specified', () => {
+          return request(app)
+            .get('/api/articles?limit=5')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles).toHaveLength(5);
+            });
+        });
+      
+        test('responds with correct page of articles', () => {
+          return request(app)
+            .get('/api/articles?limit=3&p=1')
+            .expect(200)
+            .then(({ body: page1 }) => {
+              return request(app)
+                .get('/api/articles?limit=3&p=2')
+                .expect(200)
+                .then(({ body: page2 }) => {
+                  expect(page1.articles[0].article_id).not.toEqual(page2.articles[0].article_id);
+                });
+            });
+        });
+      
+        test('includes total_count of articles in response', () => {
+          return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.total_count).toBeGreaterThanOrEqual(body.articles.length);
+              
+            });
+        });
+        test('defaults to limit=10 and page=1 if not provided', () => {
+          return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles).toHaveLength(10);
+            });
+        });
+      });
     });
-  });
   describe("Errors:", () => {
     test("400: sort_by error, queried column doesn't exist", () => {
       return request(app)
@@ -289,7 +331,25 @@ describe("GET /api/articles", () => {
           expect(body.msg).toBe("No articles found for this topic")
         })
     });
+    test('returns 400 for invalid limit value', () => {
+      return request(app)
+        .get('/api/articles?limit=-1')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid limit or page number');
+        });
+    });
+  
+    test('returns 400 for invalid page value', () => {
+      return request(app)
+        .get('/api/articles?p=0')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid limit or page number');
+        });
+    });
   })
+
 })
 
 describe("POST /api/articles", () => {
