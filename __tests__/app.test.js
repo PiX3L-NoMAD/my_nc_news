@@ -292,6 +292,110 @@ describe("GET /api/articles", () => {
   })
 })
 
+describe("POST /api/articles", () => {
+  describe("Successful responses", () => {
+    test("201: Returns 201 when new article has been added and responds with the new article", () => {
+      
+      const input = {
+        author: "butter_bridge",
+        title: "How to Learn to Love your Tofu",
+        body: "Fun fact about Mitch, he loves tofu. Loving tofu is easier than you think. Just fry it in oil and nutritional yeast and you are good to go. It is a great source of protein, fibres and happiness. Have a try for your next dinner!",
+        topic: "mitch",
+        article_img_url: "http://ewebsite.org/tofu.jpg"
+      }
+
+      return request(app)
+        .post("/api/articles")
+        .send(input)
+        .expect(201)
+        .then(({ body: { article } }) => {
+            expect(article).toEqual({
+              article_id: expect.any(Number),
+              title: "How to Learn to Love your Tofu",
+              author: "butter_bridge",
+              body: "Fun fact about Mitch, he loves tofu. Loving tofu is easier than you think. Just fry it in oil and nutritional yeast and you are good to go. It is a great source of protein, fibres and happiness. Have a try for your next dinner!",
+              topic: "mitch",
+              votes: 0,
+              comment_count: 0,
+              created_at: expect.any(String),
+              article_img_url: "http://ewebsite.org/tofu.jpg"
+            });
+        });
+    });
+  })
+
+  describe("Errors", () => {
+    test("400: Returns error if no body provided", () => {
+      const input = {
+        author: "butter_bridge",
+        title: "How to Learn to Love your Tofu",
+        topic: "mitch",
+        article_img_url: "http://ewebsite.org/tofu.jpg"
+      }
+
+      return request(app)
+        .post("/api/articles")
+        .send(input)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request - invalid input");
+      });
+    });
+    test("404: Returns error if author doesn't exist", () => {
+
+      const input = {
+        author: "tofu_lover",
+        title: "How to Learn to Love your Tofu",
+        body: "Fun fact about Mitch, he loves tofu. Loving tofu is easier than you think. Just fry it in oil and nutritional yeast and you are good to go. It is a great source of protein, fibres and happiness. Have a try for your next dinner!",
+        topic: "mitch",
+        article_img_url: "http://ewebsite.org/tofu.jpg"
+      }
+
+      return request(app)
+        .post("/api/articles")
+        .send(input)
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe("tofu_lover not found in the users data");
+        });
+    });
+    test("404: Returns error if topic doesn't exist", () => {
+
+      const input = {
+        author: "butter_bridge",
+        title: "How to Learn to Love your Tofu",
+        body: "Fun fact about Mitch, he loves tofu. Loving tofu is easier than you think. Just fry it in oil and nutritional yeast and you are good to go. It is a great source of protein, fibres and happiness. Have a try for your next dinner!",
+        topic: "food",
+        article_img_url: "http://ewebsite.org/tofu.jpg"
+      }
+
+      return request(app)
+        .post("/api/articles")
+        .send(input)
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe("food not found in the topics data");
+        });
+    });
+    test("400: Returns 400 error if title is invalid or missing", () => {
+
+      const input = {
+        author: "butter_bridge",
+        body: "Fun fact about Mitch, he loves tofu. Loving tofu is easier than you think. Just fry it in oil and nutritional yeast and you are good to go. It is a great source of protein, fibres and happiness. Have a try for your next dinner!",
+        topic: "mitch",
+        article_img_url: "http://ewebsite.org/tofu.jpg"
+      }
+      return request(app)
+        .post("/api/articles")
+        .send(input)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request - invalid input");
+        });
+    });
+  })
+})
+
 describe("GET /api/articles/:article_id", () => {
 
   describe("200: Success response", () => {
@@ -494,7 +598,6 @@ describe("POST /api/articles/:article_id/comments", () => {
     });
   })
 })
-
 
 describe("PATCH /api/articles/:article_id", () => {
   describe("200: Success response", () => {  

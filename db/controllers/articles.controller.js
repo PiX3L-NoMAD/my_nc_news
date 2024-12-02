@@ -1,5 +1,4 @@
-const endpoints = require('../../endpoints.json');
-const { selectAllArticles, selectArticlesByTopic, selectArticleById, updateArticleById } = require('../models/articles.model');
+const { selectAllArticles, selectArticleById, updateArticleById, insertArticle } = require('../models/articles.model');
 
 exports.getArticles = (req, res, next) => {
   const { sort_by, order, topic } = req.query;
@@ -37,5 +36,16 @@ exports.patchByArticleId = (req, res, next) => {
     })
     .catch((err) => {
       next(err);
-     })
-}
+     });
+};
+
+exports.postArticle = (req, res, next) => {
+  const newArticle = req.body;
+
+    insertArticle(newArticle).then((postedArticle) => {
+      return res.status(201).send({ article: postedArticle })
+    })
+    .catch((err) => {
+      next(err);
+    });
+};

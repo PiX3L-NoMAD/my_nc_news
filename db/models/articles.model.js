@@ -82,3 +82,19 @@ exports.updateArticleById = async (article_id, inc_votes) => {
       return rows[0];
     })
 };
+
+exports.insertArticle = async (newArticle) => {
+    const { author, title, body, topic, article_img_url = 'https://default-image.url', } = newArticle;
+
+    await checkExists("users", "username", author);
+    await checkExists("topics", "slug", topic);
+
+    const sqlQuery = `
+      INSERT INTO articles (author, title, body, topic, article_img_url)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *, (SELECT COUNT(*)::int FROM comments WHERE comments.article_id = articles.article_id) AS comment_count;
+    `;
+  
+    const { rows } = await db.query(sqlQuery, [author, title, body, topic, article_img_url]);
+    return rows[0];
+  };
