@@ -13,6 +13,7 @@
     </header>
     <main>
         <section id="menu">
+            <menu>
             <h2>Menu</h2>
             <ul>
                 <li class="menu-item"><button id="menu-button">Home</button></li>
@@ -20,11 +21,32 @@
                 <li class="menu-item"><button id="menu-button">Articles</button></li>
                 <li class="menu-item"><button id="menu-button">Contact</button></li>
             </ul>
+        </menu>
+        </section>
+        <section>
+            <h2>Contact Me:</h2>
+            <form method="GET" action="success.html" id="contact-form">
+                <label for="name">Name</label>
+                <input 
+                    type="text" 
+                    id="name" 
+                    placeholder="Jane Doe" 
+                    name="name"
+                    required
+                    maxlength="50"
+                    />
+                <label for="email">E-Mail</label>
+                <input type="text" id="email" placeholder="example@mail.org" email="email">
+                <label for="message">Message</label>
+                <textarea id="message" placeholder="Your message here" required></textarea>
+                <button type="submit">Send message</button>
+                <button type="reset">Clear</button>
+            </form>
         </section>
     </main>
     <footer>
         <p>
-            The developer of this site is Janilee Svaerdstaal. Visit me on LinkedIn!
+            The developer of this site is Janilee Svaerdstaal. Visit me on <a href="https://www.linkedin.com/in/janilee-svaerdstaal/">LinkedIn</a>!
         </p>
     </footer>
 </body>
