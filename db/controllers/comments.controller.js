@@ -1,21 +1,21 @@
 const { selectCommentsByArticleId, addComment, deleteComment, patchCommentVotes } = require('../models/comments.model');
 
-exports.getCommentsByArticleId = async (req, res, next) => {
+exports.getCommentsByArticleId = (req, res, next) => {
     const { article_id } = req.params;
+    const { limit, p } = req.query;
 
-    try {
-        const comments = await selectCommentsByArticleId(article_id)
-
-        if (comments.length === 0) {
-            return res.status(200).send({msg: "No comments found for this article" })
-        } 
-
-        res.status(200).send({ comments });
-    } catch (err) {
-
+    selectCommentsByArticleId(article_id, limit, p)
+    .then(({ comments, total_count }) => {
+        if (comments.length === 0) { 
+            res.status(200).send({ msg: "No comments found for this article"})
+        } else {
+            res.status(200).send({ comments: comments, total_count: total_count });
+        }
+    })
+    .catch((err) => {
         next(err);
-    }
-};
+    })
+}
 
 exports.postCommentByArticleId = (req, res, next) => {
     const { article_id } = req.params;

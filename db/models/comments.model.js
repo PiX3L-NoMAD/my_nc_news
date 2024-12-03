@@ -1,9 +1,18 @@
 const db = require("../connection");
 const { checkExists } = require('../../utils');
 
-exports.selectCommentsByArticleId = async (article_id) => {
+exports.selectCommentsByArticleId = async (article_id, limit = 10, p = 1) => {
+
+    const limitNum = Number(limit);
+    const pageNum = Number(p);
 
     await checkExists('articles', 'article_id', article_id);
+
+    if (isNaN(limitNum) || limitNum < 1 || isNaN(pageNum) || pageNum < 1) {
+        return Promise.reject({ status: 400, msg: "Invalid limit or page number" })
+    }
+
+    const offset = (pageNum -1) * limitNum;
 
     const sqlQuery = `
     SELECT 
@@ -12,14 +21,18 @@ exports.selectCommentsByArticleId = async (article_id) => {
         comments.created_at, 
         comments.author, 
         comments.body, 
-        comments.article_id  
+        comments.article_id,
+        COUNT(*) OVER()::int AS total_count 
     FROM comments
     WHERE comments.article_id = $1
-    ORDER BY comments.created_at DESC;`;
+    ORDER BY comments.created_at DESC
+    LIMIT ${limitNum} OFFSET ${pageNum};
+`;
   
-    const result = await db.query(sqlQuery, [article_id]);
-    return result.rows;
-}
+    const { rows } = await db.query(sqlQuery, [article_id]);
+    const total_count = rows.length > 0 ? rows[0].total_count : 0;
+    return { comments: rows.map(({ total_count,  ...rest }) => rest), total_count };
+};
 
 exports.addComment = async (article_id, username, body) => {
     

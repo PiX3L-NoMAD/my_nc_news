@@ -200,47 +200,47 @@ describe("GET /api/articles", () => {
           expect(articles).toBeSortedBy("votes", { descending: true, coerce: true });
           
         });
+    });
+    test("should be sorted by author in descending order", () => {
+      return request(app)
+      .get("/api/articles?sort_by=author")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        
+        expect(articles).toBeSortedBy("author", { descending: true, coerce: true });
+        
       });
-      test("should be sorted by author in descending order", () => {
-        return request(app)
-        .get("/api/articles?sort_by=author")
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          
-          expect(articles).toBeSortedBy("author", { descending: true, coerce: true });
-          
-        });
+    });
+    test("should be sorted by topic in descending order", () => {
+      return request(app)
+      .get("/api/articles?sort_by=topic")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        
+        expect(articles).toBeSortedBy("topic", { descending: true, coerce: true });
+        
       });
-      test("should be sorted by topic in descending order", () => {
-        return request(app)
-        .get("/api/articles?sort_by=topic")
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          
-          expect(articles).toBeSortedBy("topic", { descending: true, coerce: true });
-          
-        });
+    });
+    test("should be sorted by author in ascending order", () => {
+      return request(app)
+      .get("/api/articles?sort_by=author&order=asc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        
+        expect(articles).toBeSortedBy("author", { ascending: true, coerce: true });
+        
       });
-      test("should be sorted by author in ascending order", () => {
-        return request(app)
-        .get("/api/articles?sort_by=author&order=asc")
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          
-          expect(articles).toBeSortedBy("author", { ascending: true, coerce: true });
-          
-        });
+    });
+    test("should be sorted by author in uppercase ascending order", () => {
+      return request(app)
+      .get("/api/articles?sort_by=author&order=ASC")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        
+        expect(articles).toBeSortedBy("author", { ascending: true, coerce: true });
+        
       });
-      test("should be sorted by author in uppercase ascending order", () => {
-        return request(app)
-        .get("/api/articles?sort_by=author&order=ASC")
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          
-          expect(articles).toBeSortedBy("author", { ascending: true, coerce: true });
-          
-        });
-      });
+    });
       describe('Pagination query', () => {
         test('responds with correct number of articles when limit is specified', () => {
           return request(app)
@@ -283,7 +283,7 @@ describe("GET /api/articles", () => {
             });
         });
       });
-    });
+  });
   describe("Errors:", () => {
     test("400: sort_by error, queried column doesn't exist", () => {
       return request(app)
@@ -542,7 +542,7 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(comments).toBeSorted("created_at", { descending: true, coerce: true });
         
       });
-  });
+  ``});
 
     test("200: Returns no comments found when using a valid article_id that has no comments", () => {
       return request(app)
@@ -552,9 +552,51 @@ describe("GET /api/articles/:article_id/comments", () => {
           expect(body.msg).toEqual("No comments found for this article");
         });
     });
+
+    describe('Pagination query', () => {
+      test('responds with correct number of comments when limit is specified', () => {
+        return request(app)
+          .get('/api/articles/1/comments?limit=5')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments).toHaveLength(5);
+          });
+      });
+    
+      test('responds with correct page numbers of comments', () => {
+        return request(app)
+          .get('/api/articles/1/comments?limit=3&p=1')
+          .expect(200)
+          .then(({ body: page1 }) => {
+            return request(app)
+              .get('/api/articles/1/comments?limit=3&p=2')
+              .expect(200)
+              .then(({ body: page2 }) => {
+                expect(page1.comments[0].comment_id).not.toEqual(page2.comments[0].comment_id);
+              });
+          });
+      });
+    
+      test('includes total_count of comments in response', () => {
+        return request(app)
+          .get('/api/articles/1/comments')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.total_count).toBeGreaterThanOrEqual(body.comments.length);
+          });
+      });
+      test('defaults to limit=10 and page=1 if not provided', () => {
+        return request(app)
+          .get('/api/articles/1/comments')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments).toHaveLength(10);
+          });
+      });
+    });
   });
 
-  describe("400 Errors", () => {
+  describe("Errors", () => {
     test("404: Invalid article id returns no resources found when using a valid article_id doesn't exist", () => {
       return request(app)
         .get("/api/articles/23454656/comments")
@@ -563,7 +605,7 @@ describe("GET /api/articles/:article_id/comments", () => {
           expect(body.msg).toEqual("23454656 not found in the articles data");
         });
     });
-    test("400: Invalid article id, returns bad requeest when using an invalid article_id", () => {
+    test("400: Invalid article id, returns bad request when using an invalid article_id", () => {
       return request(app)
         .get("/api/articles/2and5/comments")
         .expect(400)
@@ -571,6 +613,23 @@ describe("GET /api/articles/:article_id/comments", () => {
           expect(body.msg).toEqual("Bad request - invalid input");
         })
     })
+    test('400: Invalid limit value', () => {
+      return request(app)
+        .get('/api/articles/1/comments?limit=-1')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid limit or page number');
+        });
+    });
+  
+    test('returns 400 for invalid page value', () => {
+      return request(app)
+        .get('/api/articles/1/comments?p=0')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid limit or page number');
+        });
+    });
   })
 });
 
@@ -657,7 +716,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         });
     });
   })
-})
+});
 
 describe("PATCH /api/articles/:article_id", () => {
   describe("200: Success response", () => {  
