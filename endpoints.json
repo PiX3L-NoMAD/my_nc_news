@@ -120,7 +120,7 @@
         "article_img_url": "http://ewebsite.org/tofu.jpg"
       }
     }
-},
+  },
   "GET /api/articles/:article_id": {
     "description": "Serves a single article object",
     "parameters": ["article_id"],
@@ -138,6 +138,13 @@
           "comment_count": 6
         }
     }
+  },
+  "DELETE /api/articles/:article_id": {
+    "description": "Deletes an article based on its article_id, and its comments, and returns an empty response",
+    "parameters": ["article_id"],
+    "queries": [],
+    "exampleRequestPath": "/api/articles/3", 
+    "exampleResponse": {}
   },
   "GET /api/articles/:article_id/comments": {
   "description": "Serves an array of comments for the given article_id, sorted by most recent comment first. Queries available are limit for how many results per page and p for page-number, the default values are 10 results per page, and page 1",

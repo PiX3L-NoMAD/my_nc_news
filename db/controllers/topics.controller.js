@@ -14,7 +14,7 @@ exports.postTopic = (req, res, next) => {
   const { topic, description } = req.body;
   
   insertTopic(topic, description).then((newTopic) => {
-      return res.status(201).send({ topic: newTopic });
+      res.status(201).send({ topic: newTopic });
     })
     .catch((err) => {
       next(err);

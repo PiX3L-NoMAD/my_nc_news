@@ -427,7 +427,7 @@ describe("GET /api/articles", () => {
     });
   })
 
-})
+});
 
 describe("POST /api/articles", () => {
   describe("Successful responses", () => {
@@ -531,7 +531,7 @@ describe("POST /api/articles", () => {
         });
     });
   })
-})
+});
 
 describe("GET /api/articles/:article_id", () => {
 
@@ -579,6 +579,48 @@ describe("GET /api/articles/:article_id", () => {
           expect(body.msg).toBe("123456789 not found in the articles data");
 
         });
+    });
+  });
+});
+
+describe("DELETE /api/articles/:article_id", () => {
+
+  describe("204: Success response", () => {
+    test("delete article based on article_id, and its comments, then returns an empty body", () => {
+      return request(app)
+        .delete("/api/articles/3")
+        .expect(204)
+        .then((response) => {
+          expect(response.body).toEqual({})
+          return db.query('SELECT * FROM articles WHERE article_id = 3;')
+        })
+        .then(({ rows }) => {
+          expect(rows.length).toBe(0);
+          return db.query('SELECT * FROM comments WHERE article_id = 3;')
+        })
+        .then(({ rows }) => {
+          expect(rows.length).toBe(0);
+        })
+    });
+  });
+
+  describe("Errors:", () => {
+    test("404: article_id is valid but doesn't exist", () => {
+      return request(app)
+        .delete("/api/articles/99999999")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("99999999 not found in the articles data");
+        });
+    });
+
+    test("400: Invalid article_id, not an integer", () => {
+      return request(app)
+      .delete("/api/articles/5and4")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request - invalid input");
+      });
     });
   });
 });
@@ -947,4 +989,4 @@ describe("ERRORS", () => {
         expect(body.msg).toBe("Path not found")
       })
   })
-})
+});
