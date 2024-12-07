@@ -39,6 +39,83 @@ describe("GET /api/topics", () => {
   });
 });
 
+describe("POST /api/topics", () => {
+  describe("Success responses", () => {
+    test("201: should add a new topic and return the topic object", () => {
+      const newTopic = { topic: "coding", description: "All things programming-related" };
+
+      return request(app)
+        .post("/api/topics")
+        .send(newTopic)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.topic).toEqual({
+            slug: "coding",
+            description: "All things programming-related",
+          });
+        });
+    });
+    test("201: should persist the topic in the database", () => {
+      const newTopic = { topic: "coding", description: "All things programming-related" };
+    
+      return request(app)
+        .post("/api/topics")
+        .send(newTopic)
+        .expect(201)
+        .then(() => db.query("SELECT * FROM topics WHERE slug = $1", ["coding"]))
+        .then(({ rows }) => {
+          expect(rows).toHaveLength(1);
+          expect(rows[0]).toEqual({
+            slug: "coding",
+            description: "All things programming-related",
+          });
+        });
+    });
+  })
+  describe("Error responses", () => {
+    test("400: should return error if 'slug' is missing", () => {
+      const invalidTopic = { description: "Description without a slug" };
+    
+      return request(app)
+        .post("/api/topics")
+        .send(invalidTopic)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request - invalid input");
+        });
+    });
+    test("400: should return error if request body is not an object", () => {
+      return request(app)
+        .post("/api/topics")
+        .send("invalid format")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request - invalid input");
+        });
+    });
+    test("409: should return error if 'slug' already exists", () => {
+      const duplicateTopic = { topic: "mitch", description: "Duplicate slug test" };
+    
+      return request(app)
+        .post("/api/topics")
+        .send(duplicateTopic)
+        .expect(409)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Topic already exists");
+        });
+    });
+    test("404: should return error for invalid endpoint", () => {
+      return request(app)
+        .post("/api/invalid-route")
+        .send({ topic: "test", description: "Invalid endpoint test" })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Path not found");
+        });
+    });
+  })
+})
+
 describe("GET /api/users", () => {
   test("200: Responds with an array of all user objects", () => {
     return request(app)

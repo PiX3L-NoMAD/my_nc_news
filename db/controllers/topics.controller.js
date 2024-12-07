@@ -1,5 +1,4 @@
-const endpoints = require("../../endpoints.json");
-const { selectAllTopics } = require("../models/topics.model");
+const { selectAllTopics, insertTopic } = require("../models/topics.model");
 
 exports.getTopics = (req, res, next) => {
     selectAllTopics()
@@ -7,7 +6,17 @@ exports.getTopics = (req, res, next) => {
         res.status(200).send({ topics: topics });
       })
       .catch((err) => {
-        console.log(err);
         next(err);
       });
+};
+
+exports.postTopic = (req, res, next) => {
+  const { topic, description } = req.body;
+  
+  insertTopic(topic, description).then((newTopic) => {
+      return res.status(201).send({ topic: newTopic });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
