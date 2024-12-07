@@ -14,6 +14,19 @@
       ]
     }
   },
+  "POST /api/topics": {
+    "description": "Creates a new topic with the specified topic (slug) and description.",
+    "requestBodyExample": {
+        "topic": "coding",
+        "description": "All things software developing."
+      },
+    "exampleResponse": {
+      "topic": {
+        "topic": "coding",
+        "description": "All things software developing."
+      }
+    }
+  },
   "GET /api/users": {
     "description": "serves an array of all users",
     "queries": [],
