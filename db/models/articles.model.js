@@ -99,17 +99,39 @@ exports.updateArticleById = async (article_id, inc_votes) => {
 };
 
 exports.insertArticle = async (newArticle) => {
-    const { author, title, body, topic, article_img_url = 'https://default-image.url', } = newArticle;
+  const { author, title, body, topic, article_img_url = 'https://default-image.url', } = newArticle;
 
-    await checkExists("users", "username", author);
-    await checkExists("topics", "slug", topic);
+  await checkExists("users", "username", author);
+  await checkExists("topics", "slug", topic);
 
-    const sqlQuery = `
-      INSERT INTO articles (author, title, body, topic, article_img_url)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING *, (SELECT COUNT(*)::int FROM comments WHERE comments.article_id = articles.article_id) AS comment_count;
-    `;
-  
-    const { rows } = await db.query(sqlQuery, [author, title, body, topic, article_img_url]);
-    return rows[0];
-  };
+  const sqlQuery = `
+    INSERT INTO articles (author, title, body, topic, article_img_url)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING *, (SELECT COUNT(*)::int FROM comments WHERE comments.article_id = articles.article_id) AS comment_count;
+  `;
+
+  const { rows } = await db.query(sqlQuery, [author, title, body, topic, article_img_url]);
+  return rows[0];
+};
+
+exports.removeArticle = (article_id) => {
+  return checkExists("articles", "article_id", article_id)
+  .then(() => {
+    let sqlQuery = `
+      DELETE FROM comments 
+      WHERE article_id = $1;
+    `
+    return db.query(sqlQuery, [article_id])
+  })
+    .then(() => {
+      sqlQuery = `
+        DELETE FROM articles 
+        WHERE article_id = $1 
+        RETURNING *;
+      `;
+      return db.query(sqlQuery, [article_id])
+    })
+      .then(({ rows }) => {
+        return rows[0];
+      })
+}
