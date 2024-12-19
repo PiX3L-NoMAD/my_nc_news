@@ -21,11 +21,11 @@
 │   │   ├── seed.js
 │   │   └── utils.js
 │   └── setup.sql
-├── echo
 ├── endpoints.json
 ├── error-handling.md
 ├── errors
 │   └── errors.js
+├── index.html
 ├── listen.js
 ├── package.json
 ├── package-lock.json
@@ -37,9 +37,12 @@
 │   ├── comments-router.js
 │   ├── topics-router.js
 │   └── users-router.js
+├── script.js
+├── style.css
+├── success.html
 ├── __tests__
 │   ├── app.test.js
 │   └── utils.test.js
 └── utils.js
 
-11 directories, 32 files
+11 directories, 35 files

@@ -4,7 +4,6 @@ const db = require("../connection");
 exports.selectAllArticles = (limit = 10, p = 1, sort_by = "created_at", order = "DESC", topic) => {
   const validSortBy = ["article_id", "title", "author", "topic", "created_at", "votes", "comment_count"];
   const validOrder = ["ASC", "DESC"];
-  const validTopics = ["cats", "mitch", "paper"];
 
   if (!validSortBy.includes(sort_by.toLowerCase()) || !validOrder.includes(order.toUpperCase())) {
     return Promise.reject({ status: 400, msg: "Invalid query" });
@@ -34,8 +33,8 @@ exports.selectAllArticles = (limit = 10, p = 1, sort_by = "created_at", order = 
     LEFT JOIN comments ON articles.article_id = comments.article_id `;
 
   const queryParams = [];
-
-  if (topic && validTopics.includes(topic.toLowerCase())) {
+  
+  if (topic) {
     sqlQuery += `WHERE articles.topic = $1 `;
     queryParams.push(topic);
   }

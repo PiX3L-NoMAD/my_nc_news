@@ -5,6 +5,7 @@ exports.getArticles = (req, res, next) => {
 
   selectAllArticles(limit, p, sort_by, order, topic)
     .then(({ articles, total_count }) => {
+      console.log(articles);
       if (articles.length === 0) {
         res.status(200).send({ msg: "No articles found for this topic" });
       } else {

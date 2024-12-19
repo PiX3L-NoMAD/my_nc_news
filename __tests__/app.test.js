@@ -392,14 +392,6 @@ describe("GET /api/articles", () => {
 
         });
     });
-    test("200: should give an array of all articles if given topic doesn't exist", () => {
-      return request(app)
-        .get("/api/articles?topic=habbory")
-        .expect(200)
-        .then(({ body: { articles } }) => { 
-          expect(articles.length).toBeGreaterThan(0);
-        })
-    });
     test("200: should give an empty array of all articles if given topic exists but has no articles", () => {
       return request(app)
         .get("/api/articles?topic=paper")
